@@ -1,0 +1,204 @@
+<form [formGroup]="secondFormGroup" class="outline-custom">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <mat-dialog-content>
+          <div formArrayName="orderCtrl">
+            <div
+              *ngFor="let child1 of secondFormGroup.get('orderCtrl')['controls']; let i = index;"
+              class="container-order-div"
+            >
+              <div formGroupName="{{i}}">
+                <h5>
+                  Order
+                  <ng-container
+                    *ngIf="child1.get('orderNumber').value !== ''; else elseTemplate"
+                  >
+                    {{child1.get('orderNumber').value}}
+                  </ng-container>
+                  <ng-template #elseTemplate>
+                    {{i+1}}
+                  </ng-template>
+                </h5>
+                <mat-form-field appearance="outline" floatLabel="always">
+                  <mat-label>Delivery Date</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="deliveryDate"
+                    formControlName="deliveryDate"
+                    required
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="deliveryDate"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #deliveryDate></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field appearance="outline" floatLabel="always">
+                  <mat-label>Shipping Date</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="shippingDate"
+                    formControlName="shippingDate"
+                    required
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="shippingDate"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #shippingDate></mat-datepicker>
+                </mat-form-field>
+                <div formArrayName="firstCtrl">
+                  <div id="lines-table">
+                    <!-- <table
+                      class="table table-bordered"
+                      aria-describedby="table for lines"
+                    >
+                      <tr>
+                        <th scope="col" class="table-cell-width-min">Line</th>
+                        <th scope="col" class="table-cell-width-85">
+                          {{customerCodeLabel}}
+                        </th>
+                        <th scope="col" class="table-cell-width-62">
+                          Part Code
+                        </th>
+                        <th scope="col" class="table-cell-width-82">
+                          Order Qty
+                        </th>
+                        <th scope="col" class="table-cell-width-82">
+                          PO Price
+                        </th>
+                        <th scope="col" class="table-cell-width-82">
+                          Sales Price
+                        </th>
+                        <th scope="col" class="table-cell-width-62">
+                          Prom Indicator
+                        </th>
+                        <th
+                          scope="col"
+                          class="table-cell-width-max"
+                          style="width: 90px"
+                        >
+                          Lot Number
+                          <a href="javascript:void(0)">
+                            <mat-icon
+                              matTooltip="Structure YWWwwCC meaning: Y: Year, WW: Week, ww: Warehouse, CC: Consecutive"
+                            >
+                              help_outline
+                            </mat-icon>
+                          </a>
+                        </th>
+                      </tr>
+                      <tr
+                        *ngFor="let child2 of child1.get('firstCtrl')['controls']; let j=index"
+                      >
+                        <ng-container
+                          *ngIf="child2.get('flagToUpdate').value !== 'D'"
+                          formGroupName="{{j}}"
+                        >
+                          <td class="table-cell-width-min">
+                            {{child2.get('lineNumber').value}}
+                          </td>
+                          <td class="table-cell-width-85">
+                            <input matInput formControlName="buyerPartCode" />
+                          </td>
+                          <td class="table-cell-width-73">
+                            <mat-select
+                              #sl
+                              id="partcode{{i}}{{j}}"
+                              formControlName="selectPartCode"
+                              (selectionChange)="getContractPrice(i, j, $event); getTotals();"
+                              (openedChange)="checkWarehouse(sl, i, j, $event)"
+                              required
+                            >
+                              <ng-container
+                                *ngIf="!child2.get('flagExistingLine').value; else elseTemplate"
+                              >
+                                <mat-option
+                                  *ngFor="let partCode of selectPartCodesListNew"
+                                  [value]="partCode"
+                                >
+                                  {{partCode.code}}
+                                  <ng-container
+                                    *ngIf="partCode.description !== ''"
+                                  >
+                                    - {{partCode.description}}
+                                  </ng-container>
+                                </mat-option>
+                              </ng-container>
+                              <ng-template #elseTemplate>
+                                <mat-option
+                                  *ngFor="let partCode of selectPartCodesListOld[i][j]"
+                                  [value]="partCode"
+                                >
+                                  {{partCode.code}}
+                                </mat-option>
+                              </ng-template>
+                            </mat-select>
+                          </td>
+                          <td class="text-right table-cell-width-82">
+                            <input
+                              matInput
+                              ktNumberOnly
+                              type="text"
+                              formControlName="quantities"
+                              required
+                              autocomplete="new-password"
+                              (keyup)="getTotals()"
+                            />
+                          </td>
+                          <td class="text-right table-cell-width-82">
+                            <input matInput formControlName="poPrice" />
+                          </td>
+                          <td class="text-right table-cell-width-82">
+                            <input
+                              matInput
+                              ktNumberOnly
+                              type="text"
+                              formControlName="salesOrderPrice"
+                              autocomplete="new-password"
+                            />
+                          </td>
+                          <td>
+                            <mat-select
+                              formControlName="selectPromIndicator"
+                              required
+                            >
+                              <mat-option value="Y">Y</mat-option>
+                              <mat-option value="N">N</mat-option>
+                            </mat-select>
+                          </td>
+                          <td class="table-cell-width-62">
+                            <input
+                              matInput
+                              formControlName="lotNumber"
+                              (blur)="checkLotNumber(secondFormGroup.get('warehouse').value, child2.get('selectPartCode').value, child2.get('lotNumber'))"
+                              autocomplete="new-password"
+                            />
+                          </td>
+                          <td class="table-cell-width-62 text-center">
+                            <a href="javascript:void(0)">
+                              <mat-icon
+                                color="warn"
+                                matTooltip="Remove Line"
+                                (click)="removeLine(child1, j)"
+                              >
+                                remove_circle
+                              </mat-icon>
+                            </a>
+                          </td>
+                        </ng-container>
+                      </tr>
+                    </table> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-dialog-content>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- Add formControlName="date" in input to show error  -->

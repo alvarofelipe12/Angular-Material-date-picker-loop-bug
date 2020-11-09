@@ -48,6 +48,7 @@
                   ></mat-datepicker-toggle>
                   <mat-datepicker #shippingDate></mat-datepicker>
                 </mat-form-field>
+                {{child1.value.shippingDate|json}}
                 <div formArrayName="firstCtrl">
                   <div id="lines-table">
                     <!-- <table
